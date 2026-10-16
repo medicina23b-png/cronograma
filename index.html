@@ -70,7 +70,6 @@
     signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut,
     collection, collectionGroup, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
     query, where, orderBy, limit, onSnapshot, writeBatch,
-    getMessaging, getToken, deleteToken, messagingIsSupported,
   };
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
@@ -691,7 +690,7 @@ const CONFIG = {
   // Console Firebase ▸ Configurações do projeto ▸ Cloud Messaging ▸ "Certificados
   // push da Web" ▸ Gerar par de chaves ▸ copie a "Chave do par de chaves" aqui.
   // Enquanto ficar vazia, o app só avisa com ele aberto (como antes).
-  VAPID_KEY: '',
+  VAPID_KEY: 'BBEisGj2rkOewDt9W49n1GVu52rydm5XXIABOcRkrYN3PL2lKWCr60l3xw2iQ1kxbSZoK1F1DHJFssuVJKYS3fc',
 
   // Endereço do Worker da Cloudflare que envia os pushes (pasta push-worker/).
   // Aparece no terminal depois do "wrangler deploy", ex.: https://push-23b.SEU-USUARIO.workers.dev
@@ -1129,7 +1128,7 @@ function toApiError(err) {
   const msg = (err && err.message) ? String(err.message).replace(/^Firebase:\s*/, '').replace(/\s*\(\w[\w-]*\/[\w-]+\)\.?$/, '') : 'Erro no servidor.';
   return new ApiError(auth ? 'Sessão expirada. Entre novamente.' : msg, auth ? 'AUTH' : '');
 }
- try { console.error('[Firebase erro real]', err && err.code, err && err.message); } catch (_) {}
+
 // Sem Cloud Functions neste projeto (por escolha, pra não exigir o plano
 // Blaze/cartão de crédito): tudo é gravação/leitura direta no Firestore
 // abaixo, autorizada pelas regras em firestore.rules.
@@ -3216,9 +3215,10 @@ async function registrarPush() {
   try {
     if (!pushSuportado() || !state.session || Notification.permission !== 'granted') return;
     const F = await waitFirebase();
-    if (!(await F.messagingIsSupported())) return;
+    const M = await import('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js');
+    if (!(await M.isSupported())) return;
     const reg = await navigator.serviceWorker.ready;
-    const token = await F.getToken(F.getMessaging(F.app), { vapidKey: CONFIG.VAPID_KEY, serviceWorkerRegistration: reg });
+    const token = await M.getToken(M.getMessaging(F.app), { vapidKey: CONFIG.VAPID_KEY, serviceWorkerRegistration: reg });
     if (!token) return;
     const id = await sha256Hex(token);
     await F.setDoc(F.doc(F.db, 'pushTokens', id), {
