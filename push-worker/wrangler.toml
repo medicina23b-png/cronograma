@@ -1,0 +1,12 @@
+name = "push-23b"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[triggers]
+crons = ["*/5 * * * *"]   # lembretes (~1 h antes) + rede de segurança
+
+[vars]
+PROJECT_ID = "cronograma-23b"
+API_KEY = "AIzaSyAdvBFxOKEFlhYHrdDhCkE1V1PJyAc0U64"       # chave web pública (a mesma do site)
+ALLOWED_ORIGIN = "https://SEU-SITE.pages.dev"            # troque pelo endereço do seu site (sem barra no fim)
+# Segredo (NÃO colocar aqui): wrangler secret put FIREBASE_SERVICE_ACCOUNT

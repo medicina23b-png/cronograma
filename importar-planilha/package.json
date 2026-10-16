@@ -1,0 +1,2 @@
+{ "name": "importar-planilha", "private": true, "type": "module",
+  "dependencies": { "exceljs": "^4.4.0", "firebase-admin": "^12.7.0" } }
